@@ -3,9 +3,7 @@ import { renderToString } from 'solid-js/web';
 import * as fastify from 'fastify';
 import fastifyStatic from 'fastify-static';
 import path from 'path';
-import Message from './Message.client';
-import OtherMessage from './OtherMessage.client';
-import DynamicMessage from './DynamicMessage.client';
+import Counter from './Counter.client';
 
 function App(): JSX.Element {
   return (
@@ -15,9 +13,8 @@ function App(): JSX.Element {
       </head>
       <body>
         <div>
-          <Message />
-          <OtherMessage />
-          <DynamicMessage message="Everyone" />
+          <h1>Counter App Example</h1>
+          <Counter initialValue={100} />
         </div>
       </body>
     </html>

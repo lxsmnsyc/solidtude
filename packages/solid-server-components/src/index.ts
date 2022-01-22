@@ -110,13 +110,8 @@ async function createClientEntrypoint(
     import { insert } from 'solid-js/web';
     import Comp from '${relativePath}';
 
-    export default function (id) {
+    export default function (id, props) {
       const marker = document.querySelector(\`[data-ssc="\${id}"]\`);
-      let props = {};
-      const propsData = document.querySelector(\`[data-ssc-props="\${id}"]\`);
-      if (propsData) {
-        props = JSON.parse(propsData.textContent);
-      }
       insert(marker.parentNode, () => <Comp {...props} />, marker);
     }
   `);

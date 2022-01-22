@@ -20,34 +20,9 @@ function getHookIdentifier(
   return newID;
 }
 
-function createPropsScript(
-  properties: (t.ObjectProperty | t.SpreadElement)[],
-  key: t.Identifier,
-): t.JSXElement {
-  return t.jsxElement(
-    t.jsxOpeningElement(t.jsxIdentifier('script'), [
-      t.jsxAttribute(t.jsxIdentifier('data-ssc-props'), t.jsxExpressionContainer(key)),
-      t.jsxAttribute(t.jsxIdentifier('type'), t.stringLiteral('application/json')),
-    ]),
-    t.jsxClosingElement(t.jsxIdentifier('script')),
-    [
-      t.jsxExpressionContainer(
-        t.callExpression(
-          t.memberExpression(
-            t.identifier('JSON'),
-            t.identifier('stringify'),
-          ),
-          [
-            t.objectExpression(properties),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
 function createComponentEntrypoint(
   identifier: t.Identifier,
+  properties: (t.ObjectProperty | t.SpreadElement)[],
   key: t.Identifier,
 ): t.JSXElement {
   return t.jsxElement(
@@ -67,12 +42,24 @@ function createComponentEntrypoint(
               raw: '";m("'
             }),
             t.templateElement({
-              raw: '");'
+              raw: '",'
+            }),
+            t.templateElement({
+              raw: ');'
             }, true),
           ],
           [
             identifier,
             key,
+            t.callExpression(
+              t.memberExpression(
+                t.identifier('JSON'),
+                t.identifier('stringify'),
+              ),
+              [
+                t.objectExpression(properties),
+              ],
+            ),
           ],
         ),
       ),
@@ -156,26 +143,11 @@ export default function serverComponentsBabelPlugin(): babel.PluginObj {
 
                 const entryPoint = createComponentEntrypoint(
                   binding.identifier,
+                  properties,
                   id,
                 );
 
-                if (properties.length) {
-                  path.replaceWith(
-                    t.jsxFragment(
-                      t.jsxOpeningFragment(),
-                      t.jsxClosingFragment(),
-                      [
-                        createPropsScript(
-                          properties,
-                          id,
-                        ),
-                        entryPoint,
-                      ],
-                    ),
-                  );
-                } else {
-                  path.replaceWith(entryPoint);
-                }
+                path.replaceWith(entryPoint);
               }
             }
           },
