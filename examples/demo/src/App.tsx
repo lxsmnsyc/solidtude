@@ -5,6 +5,7 @@ export default function App(): JSX.Element {
   return (
     <html lang="en">
       <head>
+        <script type="module" src="/@vite/client" />
         <title>Solid Server Components</title>
       </head>
       <body>

@@ -40,7 +40,7 @@ export default function solidtudePlugin(): vite.Plugin {
     if (result) {
       return result;
     }
-    const id = `solidtude-${entries.size}`;
+    const id = `${entries.size}`;
     entries.set(entry, id);
     return id;
   }
@@ -65,9 +65,9 @@ export default function solidtudePlugin(): vite.Plugin {
             await createClientEntrypoint(
               id,
               entry,
-              './dist/.solidtude',
+              './.solidtude',
             );
-            filename = `/dist/.solidtude/${entry}/index.tsx`;
+            filename = `/.solidtude/${entry}/index.tsx`;
             filenames.set(id, filename);
           }
           return `export default '${filename}';`;
