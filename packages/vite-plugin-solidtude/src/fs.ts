@@ -8,9 +8,9 @@ export async function removeFile(filePath: string): Promise<void> {
   return fs.rm(filePath, { recursive: true, force: true });
 }
 
-export async function fileExists(path: string): Promise<boolean> {
+export async function fileExists(filePath: string): Promise<boolean> {
   try {
-    const stat = await fs.stat(path);
+    const stat = await fs.stat(filePath);
 
     return stat.isFile();
   } catch (error) {

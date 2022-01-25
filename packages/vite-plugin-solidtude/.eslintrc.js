@@ -1,6 +1,6 @@
 module.exports = {
   "extends": [
-    'lxsmnsyc/typescript/react',
+    'lxsmnsyc/typescript',
   ],
   "parserOptions": {
     "project": "./tsconfig.eslint.json",

@@ -36,16 +36,16 @@ function createComponentEntrypoint(
         t.templateLiteral(
           [
             t.templateElement({
-              raw: 'import m from "'
+              raw: 'import m from "',
             }),
             t.templateElement({
-              raw: '";m("'
+              raw: '";m("',
             }),
             t.templateElement({
-              raw: '",'
+              raw: '",',
             }),
             t.templateElement({
-              raw: ');'
+              raw: ');',
             }, true),
           ],
           [
@@ -67,12 +67,18 @@ function createComponentEntrypoint(
   );
 }
 
-export default function serverComponentsBabelPlugin(): babel.PluginObj {
+interface State extends babel.PluginPass {
+  opts: {
+    ssr: boolean;
+  };
+}
+
+export default function solidtudePlugin(): babel.PluginObj<State> {
   return {
-    name: 'server-components',
+    name: 'solidtude',
     visitor: {
       Program(programPath) {
-        const validIdentifiers = new Set(); 
+        const validIdentifiers = new Set();
         const hooks: ImportHook = new Map();
         programPath.traverse({
           ImportDeclaration(path) {
@@ -107,13 +113,13 @@ export default function serverComponentsBabelPlugin(): babel.PluginObj {
                 for (let i = 0, len = opening.attributes.length; i < len; i += 1) {
                   const attr = opening.attributes[i];
                   if (t.isJSXAttribute(attr)) {
-                    let id: t.Expression;
+                    let property: t.Expression;
                     let computed = false;
                     if (t.isJSXNamespacedName(attr.name)) {
-                      id = t.stringLiteral(`${attr.name.namespace}:${attr.name.name}`);
+                      property = t.stringLiteral(`${attr.name.namespace.name}:${attr.name.name.name}`);
                       computed = true;
                     } else {
-                      id = t.stringLiteral(attr.name.name);
+                      property = t.stringLiteral(attr.name.name);
                     }
                     let value: t.Expression;
                     if (attr.value) {
@@ -130,7 +136,7 @@ export default function serverComponentsBabelPlugin(): babel.PluginObj {
                       value = t.booleanLiteral(true);
                     }
                     properties.push(t.objectProperty(
-                      id,
+                      property,
                       value,
                       computed,
                     ));
@@ -152,7 +158,7 @@ export default function serverComponentsBabelPlugin(): babel.PluginObj {
             }
           },
         });
-      }
+      },
     },
   };
 }
