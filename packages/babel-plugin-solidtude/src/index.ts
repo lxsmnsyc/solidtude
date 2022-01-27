@@ -20,185 +20,9 @@ function getHookIdentifier(
   return newID;
 }
 
-function createRootId(
-  hooks: ImportHook,
-  path: NodePath,
-): t.Identifier {
-  const id = path.scope.generateUidIdentifier('root');
-  path.scope.push({
-    id,
-    init: t.callExpression(
-      getHookIdentifier(hooks, path, 'createUniqueId', 'solid-js'),
-      [],
-    ),
-    kind: 'const',
-  });
-  return id;
-}
-
-function createComponentRoot(
-  hooks: ImportHook,
-  path: NodePath<t.JSXElement>,
-  key: t.Identifier,
-  hydratable: boolean,
-): t.JSXElement {
-  const attributes = [
-    t.jsxAttribute(t.jsxIdentifier('data-ssc'), t.jsxExpressionContainer(key)),
-  ];
-  if (hydratable) {
-    attributes.push(t.jsxAttribute(t.jsxIdentifier('innerHTML'), t.jsxExpressionContainer(
-      t.callExpression(
-        getHookIdentifier(hooks, path, 'renderToString', 'solid-js/web'),
-        [
-          t.arrowFunctionExpression([], path.node),
-          t.objectExpression([
-            t.objectProperty(
-              t.identifier('renderId'),
-              key,
-            ),
-          ]),
-        ],
-      ),
-    )));
-  }
-  return t.jsxElement(
-    t.jsxOpeningElement(t.jsxIdentifier('solidtude-root'), attributes),
-    t.jsxClosingElement(t.jsxIdentifier('solidtude-root')),
-    [],
-  );
-}
-
-function createComponentTemplate(
-  hooks: ImportHook,
-  path: NodePath<t.JSXElement>,
-  key: t.Identifier,
-): t.JSXElement {
-  return t.jsxElement(
-    t.jsxOpeningElement(t.jsxIdentifier('template'), [
-      t.jsxAttribute(t.jsxIdentifier('data-ssc'), t.jsxExpressionContainer(key)),
-      t.jsxAttribute(t.jsxIdentifier('innerHTML'), t.jsxExpressionContainer(
-        t.callExpression(
-          getHookIdentifier(hooks, path, 'renderToString', 'solid-js/web'),
-          [
-            t.arrowFunctionExpression([], t.jsxFragment(
-              t.jsxOpeningFragment(),
-              t.jsxClosingFragment(),
-              path.node.children,
-            )),
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('renderId'),
-                t.templateLiteral([
-                  t.templateElement({
-                    raw: 'template-',
-                  }),
-                  t.templateElement({
-                    raw: '',
-                  }, true),
-                ], [
-                  key,
-                ]),
-              ),
-            ]),
-          ],
-        ),
-      )),
-    ]),
-    t.jsxClosingElement(t.jsxIdentifier('template')),
-    [],
-  );
-}
-
-function createComponentScript(
-  identifier: t.Identifier,
-  properties: (t.ObjectProperty | t.SpreadElement)[],
-  key: t.Identifier,
-  strategy: t.Expression,
-  hydratable: boolean,
-): t.JSXElement {
-  return t.jsxElement(
-    t.jsxOpeningElement(t.jsxIdentifier('script'), [
-      t.jsxAttribute(t.jsxIdentifier('type'), t.stringLiteral('module')),
-      t.jsxAttribute(t.jsxIdentifier('innerHTML'), t.jsxExpressionContainer(
-        t.templateLiteral(
-          [
-            t.templateElement({
-              raw: 'import m from "',
-            }),
-            t.templateElement({
-              raw: '";m("',
-            }),
-            t.templateElement({
-              raw: '",',
-            }),
-            t.templateElement({
-              raw: ',',
-            }),
-            t.templateElement({
-              raw: ',',
-            }),
-            t.templateElement({
-              raw: ');',
-            }, true),
-          ],
-          [
-            t.memberExpression(
-              identifier,
-              t.identifier('src'),
-            ),
-            key,
-            t.callExpression(
-              t.memberExpression(
-                t.identifier('JSON'),
-                t.identifier('stringify'),
-              ),
-              [
-                t.objectExpression(properties),
-              ],
-            ),
-            t.callExpression(
-              t.memberExpression(
-                t.identifier('JSON'),
-                t.identifier('stringify'),
-              ),
-              [
-                strategy,
-              ],
-            ),
-            t.booleanLiteral(hydratable),
-          ],
-        ),
-      )),
-    ]),
-    t.jsxClosingElement(t.jsxIdentifier('script')),
-    [],
-  );
-}
-
-function createComponentEntrypoint(
-  hooks: ImportHook,
-  path: NodePath<t.JSXElement>,
-  identifier: t.Identifier,
-  properties: (t.ObjectProperty | t.SpreadElement)[],
-  key: t.Identifier,
-  strategy: t.Expression,
-  hydratable: boolean,
-): t.JSXFragment {
-  return t.jsxFragment(
-    t.jsxOpeningFragment(),
-    t.jsxClosingFragment(),
-    [
-      createComponentRoot(hooks, path, key, hydratable),
-      createComponentTemplate(hooks, path, key),
-      createComponentScript(identifier, properties, key, strategy, hydratable),
-    ],
-  );
-}
-
 function transformServerComponent(programPath: NodePath<t.Program>): void {
   const validIdentifiers = new Set();
   const hooks: ImportHook = new Map();
-  const skippable = new WeakSet();
   programPath.traverse({
     ImportDeclaration(path) {
       if (/client(\.[tj]sx?)?$/.test(path.node.source.value)) {
@@ -211,9 +35,6 @@ function transformServerComponent(programPath: NodePath<t.Program>): void {
       }
     },
     JSXElement(path) {
-      if (skippable.has(path.node)) {
-        return;
-      }
       const opening = path.node.openingElement;
       if (t.isJSXIdentifier(opening.name)) {
         const binding = path.scope.getBinding(opening.name.name);
@@ -221,13 +42,10 @@ function transformServerComponent(programPath: NodePath<t.Program>): void {
           binding
           && validIdentifiers.has(binding.identifier)
         ) {
-          skippable.add(path.node);
-          const id = createRootId(hooks, path);
           const properties: (t.ObjectProperty | t.SpreadElement)[] = [];
 
           let strategy: t.Expression = t.identifier('undefined');
           let hydratable = true;
-
           for (let i = 0, len = opening.attributes.length; i < len; i += 1) {
             const attr = opening.attributes[i];
             if (t.isJSXAttribute(attr)) {
@@ -244,7 +62,6 @@ function transformServerComponent(programPath: NodePath<t.Program>): void {
                     case 'visible':
                       strategy = t.objectExpression([
                         t.objectProperty(t.identifier('type'), t.stringLiteral('visible')),
-                        t.objectProperty(t.identifier('value'), id),
                       ]);
                       break;
                     case 'media': {
@@ -306,17 +123,36 @@ function transformServerComponent(programPath: NodePath<t.Program>): void {
             }
           }
 
-          const entryPoint = createComponentEntrypoint(
-            hooks,
-            path,
-            binding.identifier,
-            properties,
-            id,
-            strategy,
-            hydratable,
+          const ClientID = getHookIdentifier(hooks, path, 'Client', 'solidtude-runtime');
+          path.replaceWith(
+            t.jsxElement(
+              t.jsxOpeningElement(
+                t.jsxIdentifier(ClientID.name),
+                [
+                  t.jsxAttribute(
+                    t.jsxIdentifier('Comp'),
+                    t.jsxExpressionContainer(binding.identifier),
+                  ),
+                  t.jsxAttribute(
+                    t.jsxIdentifier('props'),
+                    t.jsxExpressionContainer(t.objectExpression(properties)),
+                  ),
+                  t.jsxAttribute(
+                    t.jsxIdentifier('hydratable'),
+                    t.jsxExpressionContainer(t.booleanLiteral(hydratable)),
+                  ),
+                  t.jsxAttribute(
+                    t.jsxIdentifier('strategy'),
+                    t.jsxExpressionContainer(strategy),
+                  ),
+                ],
+              ),
+              path.node.closingElement = t.jsxClosingElement(
+                t.jsxIdentifier(ClientID.name),
+              ),
+              path.node.children,
+            ),
           );
-
-          path.replaceWith(entryPoint);
         }
       }
     },

@@ -26,12 +26,13 @@ interface LoadStrategy {
   value?: undefined;
 }
 
-type Strategy = MediaQueryStrategy | VisibilityStrategy | LoadStrategy;
+export type Strategy = MediaQueryStrategy | VisibilityStrategy | LoadStrategy;
 
-export interface ClientProps {
+export interface ClientFlagProps {
   'client:load'?: boolean;
   'client:visible'?: boolean;
-  'client:media': string;
+  'client:media'?: string;
+  'client:only'?: boolean;
 }
 
 export default function createSolidtudeRoot<P>(

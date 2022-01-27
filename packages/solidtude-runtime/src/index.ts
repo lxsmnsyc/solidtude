@@ -1,6 +1,6 @@
 export {
   default as createSolidtudeRoot,
-  ClientProps,
+  ClientFlagProps,
 } from './create-solidtude-root';
 export {
   onVisible,
@@ -10,3 +10,6 @@ export {
 export {
   default as SolidtudeStyles,
 } from './SolidtudeStyles';
+export {
+  default as Client,
+} from './Client';

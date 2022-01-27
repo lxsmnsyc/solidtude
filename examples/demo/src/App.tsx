@@ -26,8 +26,8 @@ export default function App(): JSX.Element {
       </head>
       <body>
         <main>
-          <Counter initialValue={100} />
           <Main>
+            <Counter initialValue={100} />
             <p>This is a server-side paragraph.</p>
           </Main>
         </main>
