@@ -9,4 +9,7 @@ export default vite.defineConfig({
       ssr: true,
     }),
   ],
+  build: {
+    ssr: 'noExternal',
+  },
 });

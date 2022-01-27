@@ -62,7 +62,25 @@ export default function solidtudePlugin(): vite.Plugin {
             filename = `/.solidtude/${entry}.tsx`;
             filenames.set(id, filename);
           }
-          return `export default '${filename}';`;
+          const source = await fs.readFile(id, { encoding: 'utf-8' });
+
+          const { name, ext } = path.parse(id);
+
+          const result = await babel.transformAsync(source, {
+            presets: [
+              [typescriptPreset],
+            ],
+            plugins: [
+              [solidtudeBabelPlugin, { source: filename }],
+            ],
+            filename: name + ext,
+            sourceMaps: 'inline',
+          });
+
+          return {
+            code: result?.code ?? '',
+            map: result?.map,
+          };
         }
         return null;
       }
@@ -82,6 +100,8 @@ export default function solidtudePlugin(): vite.Plugin {
           filename,
           sourceMaps: 'inline',
         });
+
+        console.log(result.code);
 
         return {
           code: result?.code ?? '',

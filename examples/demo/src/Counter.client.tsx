@@ -15,10 +15,10 @@ export default function Counter(props: CountProps): JSX.Element {
   }
 
   return (
-    <>
+    <div>
       <button onClick={increment}>Increment</button>
       <span>Count: {count()}</span>
       <button onClick={decrement}>Decrement</button>
-    </>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import getRoot from './get-root';
+import { getRoot } from './nodes';
 
 export function onMedia(query: string, callback: () => Promise<void>): void {
   const media = window.matchMedia(query);

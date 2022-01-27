@@ -1,19 +1,15 @@
 import { createComponent, JSX, mergeProps } from 'solid-js';
-import { render, template, hydrate } from 'solid-js/web';
+import { render, hydrate } from 'solid-js/web';
 import { onLoad, onMedia, onVisible } from './scheduler';
-import getRoot from './get-root';
+import { getRoot, getFragment } from './nodes';
 
-interface PropsWithChildren {
-  children?: string;
-}
-
-type SolidtudeRoot<P extends PropsWithChildren> = (
+type SolidtudeRoot<P> = (
   id: string,
   props: P,
   strategy?: Strategy,
   hydratable?: boolean,
 ) => Promise<void>;
-type SolidtudeComp<P> = (props: Omit<P, 'children'> & { children?: JSX.Element }) => JSX.Element;
+type SolidtudeComp<P> = (props: P & { children?: JSX.Element }) => JSX.Element;
 
 interface MediaQueryStrategy {
   type: 'media';
@@ -35,21 +31,24 @@ type Strategy = MediaQueryStrategy | VisibilityStrategy | LoadStrategy;
 export interface ClientProps {
   'client:load'?: boolean;
   'client:visible'?: boolean;
-  'client:media'?: string;
+  'client:media': string;
 }
 
-export default function createSolidtudeRoot<P extends PropsWithChildren>(
+export default function createSolidtudeRoot<P>(
   source: () => Promise<{ default: SolidtudeComp<P> }>,
 ): SolidtudeRoot<P> {
-  return async (id, { children, ...props }, strategy, hydratable) => {
+  return async (id, props, strategy, hydratable) => {
     const renderCallback = async () => {
       const Comp = (await source()).default;
       const marker = getRoot(id);
-      const root = (children
+      const fragment = getFragment(id);
+      const root = (fragment
         ? () => (
           createComponent(Comp, mergeProps(props, {
             get children() {
-              return template(`<solidtude-fragment>${children.replace(/&lt;/g, '<')}</solidtude-fragment>`, 2);
+              const node = document.createElement('solidtude-fragment');
+              node.innerHTML = fragment.innerHTML;
+              return node;
             },
           }))
         )
