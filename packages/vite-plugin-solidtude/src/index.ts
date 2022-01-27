@@ -101,8 +101,6 @@ export default function solidtudePlugin(): vite.Plugin {
           sourceMaps: 'inline',
         });
 
-        console.log(result.code);
-
         return {
           code: result?.code ?? '',
           map: result?.map,
