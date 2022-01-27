@@ -11,21 +11,13 @@ async function createClientEntrypoint(
   id: string,
   target: string,
 ) {
-  const targetDir = path.join(process.cwd(), target, id);
-  const targetFile = path.join(targetDir, 'index.tsx');
+  const targetDir = path.join(process.cwd(), target);
+  const targetFile = path.join(targetDir, `${id}.tsx`);
   const relativePath = path.relative(targetDir, source);
 
-  await outputFile(targetFile, `import { insert } from 'solid-js/web';
-import { createRoot } from 'solid-js';
-import Comp from '${relativePath}';
+  await outputFile(targetFile, `import { createSolidtudeRoot } from 'solidtude-runtime';
 
-export default function (id, props) {
-  return createRoot((cleanup) => {
-    const marker = document.querySelector(\`[data-ssc="\${id}"]\`);
-    insert(marker.parentNode, () => <Comp {...props} />, marker);
-    return cleanup;
-  });
-}
+export default createSolidtudeRoot(() => import('${relativePath}'));
   `);
 
   return targetFile;
@@ -67,7 +59,7 @@ export default function solidtudePlugin(): vite.Plugin {
               entry,
               './.solidtude',
             );
-            filename = `/.solidtude/${entry}/index.tsx`;
+            filename = `/.solidtude/${entry}.tsx`;
             filenames.set(id, filename);
           }
           return `export default '${filename}';`;
