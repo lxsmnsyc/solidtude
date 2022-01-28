@@ -15,6 +15,7 @@ import { Strategy } from './create-solidtude-root';
 const ROOT = ['<solidtude-root', ' data-ssc="', '">', '</solidtude-root>'];
 const TEMPLATE = ['<template', ' data-ssc="', '">', '</template>'];
 const SCRIPT = ['<script', ' type="module">', '</script>'];
+const FRAGMENT = ['<solidtude-fragment', '>', '</solidtude-fragment>'];
 
 interface ClientComp<P> {
   (props: P & { children: JSX.Element }): JSX.Element;
@@ -31,29 +32,6 @@ interface ClientProps<P> {
 
 export default function Client<P>(props: ClientProps<P>) {
   const root = createUniqueId();
-  const result = renderToString(
-    () => (
-      createComponent(
-        props.Comp,
-        mergeProps(props.props, {
-          get children() {
-            return props.children;
-          },
-        }),
-      )
-    ),
-    {
-      renderId: root,
-    },
-  );
-  const templateResult = renderToString(
-    () => (
-      props.children
-    ),
-    {
-      renderId: root,
-    },
-  );
 
   const propsResult = JSON.stringify(props.props);
   if (props.strategy?.type === 'visible') {
@@ -62,8 +40,36 @@ export default function Client<P>(props: ClientProps<P>) {
   const strategyResult = JSON.stringify(props.strategy);
 
   return [
-    ssr(ROOT, ssrHydrationKey(), escape(root), result),
-    ssr(TEMPLATE, ssrHydrationKey(), escape(root), templateResult),
+    ssr(
+      ROOT,
+      ssrHydrationKey(),
+      escape(root),
+      props.hydratable
+        ? renderToString(
+          () => (
+            createComponent(
+              props.Comp,
+              mergeProps(props.props, {
+                get children() {
+                  return ssr(FRAGMENT, ssrHydrationKey(), props.children) as unknown as JSX.Element;
+                },
+              }),
+            )
+          ),
+          {
+            renderId: root,
+          },
+        )
+        : '',
+    ),
+    ssr(TEMPLATE, ssrHydrationKey(), escape(root), renderToString(
+      () => (
+        ssr(FRAGMENT, ssrHydrationKey(), props.children)
+      ),
+      {
+        renderId: root,
+      },
+    )),
     ssr(
       SCRIPT,
       ssrHydrationKey(),

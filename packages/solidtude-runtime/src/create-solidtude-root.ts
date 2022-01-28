@@ -2,6 +2,7 @@ import { createComponent, JSX, mergeProps } from 'solid-js';
 import { render, hydrate } from 'solid-js/web';
 import { onLoad, onMedia, onVisible } from './scheduler';
 import { getRoot, getFragment } from './nodes';
+import processScript from './process-script';
 
 type SolidtudeRoot<P> = (
   id: string,
@@ -47,8 +48,8 @@ export default function createSolidtudeRoot<P>(
         ? () => (
           createComponent(Comp, mergeProps(props, {
             get children() {
-              const node = document.createElement('solidtude-fragment');
-              node.innerHTML = fragment.innerHTML;
+              const node = (fragment as HTMLTemplateElement).content.firstChild!;
+              processScript(node);
               return node;
             },
           }))

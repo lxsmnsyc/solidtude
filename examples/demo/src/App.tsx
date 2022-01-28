@@ -26,7 +26,7 @@ export default function App(): JSX.Element {
       </head>
       <body>
         <main>
-          <Main>
+          <Main client:only>
             <Counter initialValue={100} />
             <p>This is a server-side paragraph.</p>
           </Main>

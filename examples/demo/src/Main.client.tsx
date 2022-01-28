@@ -1,7 +1,7 @@
 import { JSX } from 'solid-js';
-import { ClientProps } from 'solidtude-runtime';
+import { ClientFlagProps } from 'solidtude-runtime';
 
-interface MainProps extends ClientProps {
+interface MainProps extends ClientFlagProps {
   children: JSX.Element;
 }
 
