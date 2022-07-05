@@ -1,8 +1,9 @@
 import { createSignal, JSX } from 'solid-js';
+import { ClientComponent } from 'solidtude/core';
 
-interface CountProps {
+type CountProps = ClientComponent<{
   initialValue: number;
-}
+}>
 
 export default function Counter(props: CountProps): JSX.Element {
   const [count, setCount] = createSignal(props.initialValue);

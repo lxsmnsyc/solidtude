@@ -1,9 +1,6 @@
 {
   "name": "vite-plugin-solidtude",
   "version": "0.0.0",
-  "types": "dist/types/index.d.ts",
-  "main": "dist/cjs/production/index.js",
-  "module": "dist/esm/production/index.js",
   "exports": {
     ".": {
       "development": {
@@ -12,27 +9,6 @@
       },
       "require": "./dist/cjs/production/index.js",
       "import": "./dist/esm/production/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./dev": {
-      "production": {
-        "require": "./dist/cjs/production/index.js",
-        "import": "./dist/esm/production/index.js"
-      },
-      "require": "./dist/cjs/development/index.js",
-      "import": "./dist/esm/development/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./esm": {
-      "development": "./dist/esm/development/index.js",
-      "production": "./dist/esm/production/index.js",
-      "default": "./dist/esm/production/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./cjs": {
-      "development": "./dist/cjs/development/index.js",
-      "production": "./dist/cjs/production/index.js",
-      "default": "./dist/cjs/production/index.js",
       "types": "./dist/types/index.d.ts"
     }
   },
@@ -48,14 +24,14 @@
     "pridepack"
   ],
   "devDependencies": {
+    "@types/babel__core": "^7.1.19",
     "@types/node": "^17.0.11",
-    "eslint": "^8.7.0",
-    "eslint-config-lxsmnsyc": "^0.4.0",
-    "pridepack": "1.0.4",
-    "solidtude-runtime": "0.0.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.4",
-    "vite": "^2.7.13"
+    "eslint": "^8.19.0",
+    "eslint-config-lxsmnsyc": "^0.4.1",
+    "pridepack": "2.0.1",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.13"
   },
   "private": false,
   "description": "",
@@ -83,12 +59,19 @@
     "dev": "pridepack dev"
   },
   "peerDependencies": {
-    "vite": "^2.7",
-    "solidtude-runtime": "^0.0"
+    "solidtude-runtime": "^0.0",
+    "vite": "^2.7"
   },
   "dependencies": {
-    "@babel/core": "^7.16.10",
-    "@babel/preset-typescript": "^7.16.7",
-    "babel-plugin-solidtude": "0.0.0"
+    "@babel/core": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "solidtude": "0.0.0"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/types/index.d.ts"
+      ]
+    }
   }
 }

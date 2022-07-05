@@ -29,12 +29,12 @@ interface LoadStrategy {
 
 export type Strategy = MediaQueryStrategy | VisibilityStrategy | LoadStrategy;
 
-export interface ClientFlagProps {
+export type ClientComponent<P> = P & {
   'client:load'?: boolean;
   'client:visible'?: boolean;
   'client:media'?: string;
   'client:only'?: boolean;
-}
+};
 
 export default function createSolidtudeRoot<P>(
   source: () => Promise<{ default: SolidtudeComp<P> }>,

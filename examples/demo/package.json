@@ -6,16 +6,16 @@
     "build:server": "vite build --outDir dist/server --ssr src/root.tsx "
   },
   "devDependencies": {
-    "eslint": "^8.7.0",
-    "eslint-config-lxsmnsyc": "^0.4.0",
-    "typescript": "^4.5.4",
-    "vite": "^2.7.13",
-    "vite-plugin-solid": "^2.2.4",
+    "eslint": "^8.19.0",
+    "eslint-config-lxsmnsyc": "^0.4.1",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.13",
+    "vite-plugin-solid": "^2.2.6",
     "vite-plugin-solidtude": "0.0.0"
   },
   "dependencies": {
     "express": "^4.17.2",
-    "solid-js": "^1.3.3",
-    "solidtude-runtime": "0.0.0"
+    "solid-js": "^1.4.6",
+    "solidtude": "0.0.0"
   }
 }

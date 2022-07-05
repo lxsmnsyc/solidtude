@@ -1,9 +1,9 @@
 {
   "exclude": ["node_modules"],
-  "include": ["src", "types", "test"],
+  "include": ["babel", "core"],
   "compilerOptions": {
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
@@ -14,8 +14,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    "jsx": "react",
     "esModuleInterop": true,
     "target": "ES2017"
   }

@@ -1,9 +1,9 @@
 import { JSX } from 'solid-js';
-import { ClientFlagProps } from 'solidtude-runtime';
+import { ClientComponent } from 'solidtude/core';
 
-interface MainProps extends ClientFlagProps {
+type MainProps = ClientComponent<{
   children: JSX.Element;
-}
+}>
 
 export default function Main(props: MainProps): JSX.Element {
   return (

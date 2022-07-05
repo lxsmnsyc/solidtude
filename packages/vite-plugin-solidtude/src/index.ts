@@ -3,8 +3,12 @@ import * as path from 'path';
 import * as babel from '@babel/core';
 import * as fs from 'fs/promises';
 import typescriptPreset from '@babel/preset-typescript';
-import solidtudeBabelPlugin from 'babel-plugin-solidtude';
+import solidtudeBabelPlugin from 'solidtude/babel';
 import { outputFile } from './fs';
+
+function toPosix(filepath: string): string {
+  return filepath.split(path.sep).join(path.posix.sep);
+}
 
 async function createClientEntrypoint(
   source: string,
@@ -13,9 +17,9 @@ async function createClientEntrypoint(
 ) {
   const targetDir = path.join(process.cwd(), target);
   const targetFile = path.join(targetDir, `${id}.tsx`);
-  const relativePath = path.relative(targetDir, source);
+  const relativePath = toPosix(path.relative(targetDir, source));
 
-  await outputFile(targetFile, `import { createSolidtudeRoot } from 'solidtude-runtime';
+  await outputFile(targetFile, `import { createSolidtudeRoot } from 'solidtude/core';
 
 export default createSolidtudeRoot(() => import('${relativePath}'));
   `);

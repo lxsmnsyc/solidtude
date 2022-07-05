@@ -12,7 +12,13 @@ export function onMedia(query: string, callback: () => Promise<void>): void {
     }
   };
 
-  media.addEventListener('change', onMediaCallback);
+  if (media.matches) {
+    callback().catch(() => {
+      // no-op
+    });
+  } else {
+    media.addEventListener('change', onMediaCallback);
+  }
 }
 
 export function onVisible(id: string, callback: () => Promise<void>): void {

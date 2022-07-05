@@ -123,7 +123,7 @@ function transformServerComponent(programPath: NodePath<t.Program>): void {
             }
           }
 
-          const ClientID = getHookIdentifier(hooks, path, 'Client', 'solidtude-runtime');
+          const ClientID = getHookIdentifier(hooks, path, 'Client', 'solidtude/core');
           path.replaceWith(
             t.jsxElement(
               t.jsxOpeningElement(

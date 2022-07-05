@@ -1,6 +1,6 @@
 import { JSX } from 'solid-js';
 import { HydrationScript } from 'solid-js/web';
-import { SolidtudeStyles } from 'solidtude-runtime';
+import { SolidtudeStyles } from 'solidtude/core';
 import Counter from './Counter.client';
 import Main from './Main.client';
 
@@ -26,8 +26,8 @@ export default function App(): JSX.Element {
       </head>
       <body>
         <main>
-          <Main client:only>
-            <Counter initialValue={100} />
+          <Main>
+            <Counter client:media="(orientation: portrait)" initialValue={100} />
             <p>This is a server-side paragraph.</p>
           </Main>
         </main>
